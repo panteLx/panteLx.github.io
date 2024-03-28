@@ -51,7 +51,7 @@ function sendRequest() {
       totalWeightDivCar.innerText =
         "Datenabruf fehlgeschlagen. Versuche es später erneut!";
     } else {
-      totalWeightDivCar.innerText = `${carData.totalWeight.toFixed(0)}/1850 KG`;
+      totalWeightDivCar.innerText = `${carData.totalWeight.toFixed(0)}/7500 KG`;
     }
 
     if (carStatus.error) {
