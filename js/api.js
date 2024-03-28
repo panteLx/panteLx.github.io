@@ -6,6 +6,8 @@ function sendRequest() {
   const bearerTokenLab = "7YC9YM41X63SG52ZDL";
   const bearerTokenCar = "F9UKIAKBZDHWY6H6JG";
 
+  const corsAnywhereUrl = "https://statev.sebastianstahl.net/"; // CORS Proxy - Fliegt bei IC Website raus
+
   const fetchConfig = (bearerToken) => ({
     method: "GET",
     headers: {
@@ -15,7 +17,7 @@ function sendRequest() {
   });
 
   const fetchData = (endpoint, config) =>
-    fetch(apiUrl + endpoint, config)
+    fetch(corsAnywhereUrl + apiUrl + endpoint, config)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
