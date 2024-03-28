@@ -26,6 +26,7 @@ function sendRequest() {
       })
       .catch((error) => {
         console.error("Fehler beim Senden der Anfrage:", error);
+        return { error: true }; // Zur Unterscheidung, dass ein Fehler aufgetreten ist
       });
 
   Promise.all([
@@ -39,14 +40,36 @@ function sendRequest() {
     const carStatusDiv = document.getElementById("car-status");
     const labStatusDiv = document.getElementById("lab-status");
 
-    totalWeightDivLab.innerText = `${labData.totalWeight.toFixed(0)}/1850 KG`;
-    totalWeightDivCar.innerText = `${carData.totalWeight.toFixed(0)}/1850 KG`;
+    if (labData.error) {
+      totalWeightDivLab.innerText =
+        "Datenabruf fehlgeschlagen. Versuche es später erneut!";
+    } else {
+      totalWeightDivLab.innerText = `${labData.totalWeight.toFixed(0)}/1850 KG`;
+    }
 
-    carStatusDiv.innerHTML = carStatus[0].isOpen
-      ? "<a href='#' class='fa fa-check'></a>"
-      : "<a href='#' class='fa fa-times'></a>";
-    labStatusDiv.innerHTML = labStatus[0].isOpen
-      ? "<a href='#' class='fa fa-check'></a>"
-      : "<a href='#' class='fa fa-times'></a>";
+    if (carData.error) {
+      totalWeightDivCar.innerText =
+        "Datenabruf fehlgeschlagen. Versuche es später erneut!";
+    } else {
+      totalWeightDivCar.innerText = `${carData.totalWeight.toFixed(0)}/1850 KG`;
+    }
+
+    if (carStatus.error) {
+      carStatusDiv.innerHTML =
+        "<strong class='statusweight'>Datenabruf fehlgeschlagen. Versuche es später erneut!</strong>";
+    } else {
+      carStatusDiv.innerHTML = carStatus[0].isOpen
+        ? "<a href='#' class='fa fa-check'></a>"
+        : "<a href='#' class='fa fa-times'></a>";
+    }
+
+    if (labStatus.error) {
+      labStatusDiv.innerHTML =
+        "<strong class='statusweight'>Datenabruf fehlgeschlagen. Versuche es später erneut!</strong>";
+    } else {
+      labStatusDiv.innerHTML = labStatus[0].isOpen
+        ? "<a href='#' class='fa fa-check'></a>"
+        : "<a href='#' class='fa fa-times'></a>";
+    }
   });
 }
