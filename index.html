@@ -16,7 +16,7 @@
      <link rel="stylesheet" href="css/custom.css">
 
 </head>
-<body data-spy="scroll" data-target="#navbarNav" data-offset="50">
+<body data-spy="scroll" data-target="#navbarNav" data-offset="50" onload="sendRequest()">
 
     <!-- MENU BAR -->
     <nav class="navbar navbar-expand-lg fixed-top">
@@ -54,8 +54,6 @@
 
         </div>
     </nav>
-
-
      <!-- HERO -->
      <section class="hero d-flex flex-column justify-content-center align-items-center" id="home">
 
@@ -92,18 +90,18 @@
 
                     <h6 class="mb-4 text-white" data-aos="fade-up">Der Haken bei "Ankauf Status" ist gesetzt? Dann kann es sofort losgehen!</h6>
 
-                    <p data-aos="fade-up" data-aos-delay="200">Den aktuellen Ankaufpreis erhälst du über den Marktplatz oder per SMS/Mail direkt von uns.</p>
+                    <p data-aos="fade-up" data-aos-delay="200">Den aktuellen Ankaufpreis erhältst du über den Marktplatz oder per SMS/Mail direkt von uns.</p>
+                    <p data-aos="fade-up" data-aos-delay="300">Du brauchst dringend Geld aber wir kaufen nichts an? Ruf uns einfach an, vielleicht können wir dir deine Waren trotzdem abnehmen.</p>
                 </div>
 
                 <div class="mr-lg-auto mt-3 col-lg-4 col-md-6 col-12">
                      <div class="storage-info">
                           <div>
 
-                                <h2 class="mb-4 text-white" data-aos="fade-up" data-aos-delay="500">Ankauf Status: <a href="#" class="fa fa-check"></a></h2>
+                                <h2 class="mb-4 text-white" data-aos="fade-up" data-aos-delay="500">Ankauf Status <p class="status">Autofertigung <strong id="car-status"></strong><br>Labor <strong id="lab-status"></strong></p></h2>
 
-                               <strong class="d-block" data-aos="fade-up" data-aos-delay="600">Lager Gewicht: 0/1850</strong>
-
-                               <p data-aos="fade-up" data-aos-delay="700" style="padding-top: 20px;">Du brauchst dringend Geld aber wir kaufen nichts an? Ruf uns einfach an, vielleicht können wir dir deine Waren trotzdem abnehmen.</p>
+                                <h2 class="mb-4 text-white" data-aos="fade-up" data-aos-delay="600">Lager<p class="status">Labor <strong id="totalWeightLab"></strong><br> Autofertigung <strong id="totalWeightCar"></strong></p></h2>
+                               <p data-aos="fade-up" data-aos-delay="700">Lager voll? Dann kannst du aktuell leider keine Ware abgeben. Ruf am besten direkt an und gib bescheid.</p>
 
                                </div>
                           </div>
@@ -268,6 +266,7 @@
      <script src="js/aos.js"></script>
      <script src="js/smoothscroll.js"></script>
      <script src="js/custom.js"></script>
+     <script src="js/api.js"></script>
 
 </body>
 </html>

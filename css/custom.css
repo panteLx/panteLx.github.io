@@ -235,6 +235,10 @@ a:focus {
   padding-left: 3.5rem;
 }
 
+.storage-info .status {
+  letter-spacing: 0px;
+}
+
 .storage-info strong {
   color: var(--white-color);
   opacity: 0.85;
