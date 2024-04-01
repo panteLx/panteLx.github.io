@@ -1,3 +1,6 @@
+// Initialisierung des Caches aus dem Local Storage
+let cache = JSON.parse(localStorage.getItem("cache")) || {};
+
 function sendRequest() {
   const apiUrl = "https://api.statev.de/req/";
   const totalWeightEndpointLab = "factory/inventory/65ca64cb06965a9320fb010e";
@@ -16,18 +19,30 @@ function sendRequest() {
     },
   });
 
-  const fetchData = (endpoint, config) =>
-    fetch(corsAnywhereUrl + apiUrl + endpoint, config)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .catch((error) => {
-        console.error("Fehler beim Senden der Anfrage:", error);
-        return { error: true }; // Zur Unterscheidung, dass ein Fehler aufgetreten ist
-      });
+  const fetchData = (endpoint, config) => {
+    // Überprüfen, ob die Daten im Cache vorhanden sind
+    if (cache[endpoint]) {
+      return Promise.resolve(cache[endpoint]);
+    } else {
+      return fetch(corsAnywhereUrl + apiUrl + endpoint, config)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          // Daten im Cache speichern
+          cache[endpoint] = data;
+          saveCacheToLocalStorage(); // Cache im Local Storage speichern
+          return data;
+        })
+        .catch((error) => {
+          console.error("Fehler beim Senden der Anfrage:", error);
+          return { error: true }; // Zur Unterscheidung, dass ein Fehler aufgetreten ist
+        });
+    }
+  };
 
   Promise.all([
     fetchData(totalWeightEndpointLab, fetchConfig(bearerTokenLab)),
@@ -73,3 +88,11 @@ function sendRequest() {
     }
   });
 }
+
+// Funktion zum Speichern des Caches im Local Storage
+function saveCacheToLocalStorage() {
+  localStorage.setItem("cache", JSON.stringify(cache));
+}
+
+// sendRequest aufrufen, um den Cache zu verwenden
+sendRequest();
