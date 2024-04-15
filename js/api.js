@@ -11,7 +11,7 @@ function sendRequest() {
   const bearerTokenLab = "7YC9YM41X63SG52ZDL";
   const bearerTokenCar = "F9UKIAKBZDHWY6H6JG";
 
-  const corsAnywhereUrl = "https://statev.pantelx.com/"; // CORS Proxy - Fliegt bei IC Website raus
+  const corsAnywhereUrl = "https://statevproxy.pantelx.com/"; // CORS Proxy - Fliegt bei IC Website raus
 
   const fetchConfig = (bearerToken) => ({
     method: "GET",
