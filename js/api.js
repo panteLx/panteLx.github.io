@@ -9,8 +9,8 @@ function sendRequest() {
 
   const statusEndpoint = "factory/list";
   const bearerTokenLab = "7YC9YM41X63SG52ZDL";
-  const bearerTokenCar = "F9UKIAKBZDHWY6H6JG";
-
+  //  const bearerTokenCar = "F9UKIAKBZDHWY6H6JG";
+  const bearerTokenCar = "7YC9YM41X63SG52ZDL";
   const corsAnywhereUrl = "https://statevproxy.pantelx.com/"; // CORS Proxy - Fliegt bei IC Website raus
 
   const fetchConfig = (bearerToken) => ({
