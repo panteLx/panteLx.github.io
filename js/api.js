@@ -6,6 +6,10 @@ function sendRequest() {
 
   const totalWeightEndpointLab = "factory/inventory/65ca64cb06965a9320fb010e";
   const totalWeightEndpointCar = "factory/inventory/65ca64ca06965a9320fb0031";
+  const marketOffersBuyLabEndpoint =
+    "factory/marketOffers/buy/65ca64cb06965a9320fb010e";
+  const marketOffersSellLabEndpoint =
+    "factory/marketOffers/sell/65ca64cb06965a9320fb010e";
 
   const statusEndpoint = "factory/list";
   const bearerTokenLab = "7YC9YM41X63SG52ZDL";
@@ -51,43 +55,108 @@ function sendRequest() {
     fetchData(totalWeightEndpointCar, fetchConfig(bearerTokenCar)),
     fetchData(statusEndpoint, fetchConfig(bearerTokenCar)),
     fetchData(statusEndpoint, fetchConfig(bearerTokenLab)),
-  ]).then(([labData, carData, carStatus, labStatus]) => {
-    const totalWeightDivLab = document.getElementById("totalWeightLab");
-    const totalWeightDivCar = document.getElementById("totalWeightCar");
-    const carStatusDiv = document.getElementById("car-status");
-    const labStatusDiv = document.getElementById("lab-status");
+    fetchData(marketOffersBuyLabEndpoint, fetchConfig(bearerTokenLab)),
+    fetchData(marketOffersSellLabEndpoint, fetchConfig(bearerTokenLab)),
+  ]).then(
+    ([
+      labData,
+      carData,
+      carStatus,
+      labStatus,
+      marketOffersBuyLab,
+      marketOffersSellLab,
+    ]) => {
+      const totalWeightDivLab = document.getElementById("totalWeightLab");
+      const totalWeightDivCar = document.getElementById("totalWeightCar");
+      const carStatusDiv = document.getElementById("car-status");
+      const labStatusDiv = document.getElementById("lab-status");
 
-    if (labData.error) {
-      totalWeightDivLab.innerText =
-        "Datenabruf fehlgeschlagen. Versuche es später erneut!";
-    } else {
-      totalWeightDivLab.innerText = `${labData.totalWeight.toFixed(0)}/1850 KG`;
-    }
+      if (labData.error) {
+        totalWeightDivLab.innerText =
+          "Datenabruf fehlgeschlagen. Versuche es später erneut!";
+      } else {
+        totalWeightDivLab.innerText = `${labData.totalWeight.toFixed(
+          0
+        )}/1850 KG`;
+      }
 
-    if (carData.error) {
-      totalWeightDivCar.innerText =
-        "Datenabruf fehlgeschlagen. Versuche es später erneut!";
-    } else {
-      totalWeightDivCar.innerText = `${carData.totalWeight.toFixed(0)}/7500 KG`;
-    }
+      if (carData.error) {
+        totalWeightDivCar.innerText =
+          "Datenabruf fehlgeschlagen. Versuche es später erneut!";
+      } else {
+        totalWeightDivCar.innerText = `${carData.totalWeight.toFixed(
+          0
+        )}/7500 KG`;
+      }
 
-    if (carStatus.error) {
-      carStatusDiv.innerHTML =
-        "<strong class='statusweight'>Datenabruf fehlgeschlagen. Versuche es später erneut!</strong>";
-    } else {
-      carStatusDiv.innerHTML = carStatus[0].isOpen
-        ? "<a href='#' class='fa fa-check'></a>"
-        : "<a href='#' class='fa fa-times'></a>";
-    }
+      if (carStatus.error) {
+        carStatusDiv.innerHTML =
+          "<strong class='statusweight'>Datenabruf fehlgeschlagen. Versuche es später erneut!</strong>";
+      } else {
+        carStatusDiv.innerHTML = carStatus[0].isOpen
+          ? "<a href='#' class='fa fa-check'></a>"
+          : "<a href='#' class='fa fa-times'></a>";
+      }
 
-    if (labStatus.error) {
-      labStatusDiv.innerHTML =
-        "<strong class='statusweight'>Datenabruf fehlgeschlagen. Versuche es später erneut!</strong>";
-    } else {
-      labStatusDiv.innerHTML = labStatus[0].isOpen
-        ? "<a href='#' class='fa fa-check'></a>"
-        : "<a href='#' class='fa fa-times'></a>";
+      if (labStatus.error) {
+        labStatusDiv.innerHTML =
+          "<strong class='statusweight'>Datenabruf fehlgeschlagen. Versuche es später erneut!</strong>";
+      } else {
+        labStatusDiv.innerHTML = labStatus[0].isOpen
+          ? "<a href='#' class='fa fa-check'></a>"
+          : "<a href='#' class='fa fa-times'></a>";
+      }
+
+      if (!marketOffersBuyLab.error) {
+        populatemarketOffersBuyLabTable(marketOffersBuyLab);
+      } else {
+        console.error(
+          "Fehler beim Abrufen der Marktangebote:",
+          marketOffersBuyLab
+        );
+      }
+
+      if (!marketOffersSellLab.error) {
+        populatemarketOffersSellLabTable(marketOffersSellLab);
+      } else {
+        console.error(
+          "Fehler beim Abrufen der Marktangebote:",
+          marketOffersSellLab
+        );
+      }
     }
+  );
+}
+
+// Funktion zum Befüllen der Marktangebote-Tabelle
+function populatemarketOffersBuyLabTable(data) {
+  const tableBody = document.querySelector("#market-offers-buy tbody");
+  tableBody.innerHTML = ""; // Bestehende Inhalte löschen
+  data.forEach((item) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${item.item}</td>
+      <td>${item.availableAmount}</td>
+      <td>${item.pricePerUnit.toFixed(2)} $</td>
+      <td>Labor</td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+// Funktion zum Befüllen der Marktangebote-Tabelle
+function populatemarketOffersSellLabTable(data) {
+  const tableBody = document.querySelector("#market-offers-sell tbody");
+  tableBody.innerHTML = ""; // Bestehende Inhalte löschen
+  data.forEach((item) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+        <td>${item.item}</td>
+        <td>${item.availableAmount}</td>
+        <td>${item.pricePerUnit.toFixed(2)} $</td>
+        <td>Labor</td>
+      `;
+    tableBody.appendChild(row);
   });
 }
 

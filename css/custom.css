@@ -223,7 +223,7 @@ a:focus {
 }
 
 /*---------------------------------------
-    SELLING & MARKETLIST         
+    SELLING         
   -----------------------------------------*/
 
 .selling {
@@ -251,6 +251,10 @@ a:focus {
   font-size: medium !important;
 }
 
+/*---------------------------------------
+    MARKETLIST         
+  -----------------------------------------*/
+
 .market-list {
   padding-top: 10rem;
 }
@@ -260,10 +264,12 @@ table {
   border-collapse: collapse;
 }
 table,
-td {
+td,
+th {
   border: 1px var(--gray-color) solid;
 }
-td {
+td,
+th {
   padding: 8px;
   text-align: left;
 }
