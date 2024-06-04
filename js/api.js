@@ -9,7 +9,7 @@ function sendRequest() {
 
   const statusEndpoint = "factory/list";
   const bearerTokenLab = "7YC9YM41X63SG52ZDL";
-  //  const bearerTokenCar = "F9UKIAKBZDHWY6H6JG";
+  //  const bearerTokenCar = "F9UKIAKBZDHWY6H6JG"; OLD
   const bearerTokenCar = "7YC9YM41X63SG52ZDL";
   const corsAnywhereUrl = "https://statevproxy.pantelx.com/"; // CORS Proxy - Fliegt bei IC Website raus
 
@@ -26,23 +26,26 @@ function sendRequest() {
     if (cache[endpoint] && Date.now() - cache[endpoint].timestamp < 600000) {
       return Promise.resolve(cache[endpoint].data);
     } else {
-      return fetch(corsAnywhereUrl + apiUrl + endpoint, config)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          // Daten im Cache speichern mit Zeitstempel
-          cache[endpoint] = { data: data, timestamp: Date.now() };
-          saveCacheToLocalStorage(); // Cache im Local Storage speichern
-          return data;
-        })
-        .catch((error) => {
-          console.error("Fehler beim Senden der Anfrage:", error);
-          return { error: true };
-        });
+      return (
+        fetch(apiUrl + endpoint, config)
+          //return fetch(corsAnywhereUrl + apiUrl + endpoint, config)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            // Daten im Cache speichern mit Zeitstempel
+            cache[endpoint] = { data: data, timestamp: Date.now() };
+            saveCacheToLocalStorage(); // Cache im Local Storage speichern
+            return data;
+          })
+          .catch((error) => {
+            console.error("Fehler beim Senden der Anfrage:", error);
+            return { error: true };
+          })
+      );
     }
   };
 
