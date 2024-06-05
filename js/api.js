@@ -128,7 +128,7 @@ function sendRequest() {
   );
 }
 
-// Funktion zum Befüllen der Marktangebote-Tabelle
+// Funktion zum Befüllen der Marktangebote-Tabelle BUY
 function populatemarketOffersBuyLabTable(data) {
   const tableBody = document.querySelector("#market-offers-buy tbody");
   tableBody.innerHTML = ""; // Bestehende Inhalte löschen
@@ -137,14 +137,14 @@ function populatemarketOffersBuyLabTable(data) {
     row.innerHTML = `
       <td>${item.item}</td>
       <td>${item.availableAmount}</td>
-      <td>${item.pricePerUnit.toFixed(2)} $</td>
+      <td>${(item.pricePerUnit * 0.95).toFixed(2)} $</td>
       <td>Labor</td>
     `;
     tableBody.appendChild(row);
   });
 }
 
-// Funktion zum Befüllen der Marktangebote-Tabelle
+// Funktion zum Befüllen der Marktangebote-Tabelle SELL
 function populatemarketOffersSellLabTable(data) {
   const tableBody = document.querySelector("#market-offers-sell tbody");
   tableBody.innerHTML = ""; // Bestehende Inhalte löschen
