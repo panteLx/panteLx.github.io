@@ -3,7 +3,6 @@ let cache = JSON.parse(localStorage.getItem("cache")) || {};
 
 // Konfiguration der Endpunkte und Tokens
 const apiUrl = "https://api.statev.de/req/";
-const corsAnywhereUrl = "https://statevproxy.pantelx.com/";
 const endpoints = {
   totalWeightLab: "factory/inventory/65ca64cb06965a9320fb010e",
   totalWeightCar: "factory/inventory/65ca64ca06965a9320fb0031",
@@ -30,25 +29,22 @@ const fetchData = (endpoint, config) => {
   if (cache[endpoint] && Date.now() - cache[endpoint].timestamp < 600000) {
     return Promise.resolve(cache[endpoint].data);
   } else {
-    return (
-      fetch(corsAnywhereUrl + apiUrl + endpoint, config)
-        //return fetch(apiUrl + endpoint, config)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          cache[endpoint] = { data, timestamp: Date.now() };
-          saveCacheToLocalStorage();
-          return data;
-        })
-        .catch((error) => {
-          console.error("Fehler beim Senden der Anfrage:", error);
-          return { error: true };
-        })
-    );
+    return fetch(apiUrl + endpoint, config)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        cache[endpoint] = { data, timestamp: Date.now() };
+        saveCacheToLocalStorage();
+        return data;
+      })
+      .catch((error) => {
+        console.error("Fehler beim Senden der Anfrage:", error);
+        return { error: true };
+      });
   }
 };
 
