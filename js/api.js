@@ -1,177 +1,140 @@
 // Initialisierung des Caches aus dem Local Storage
 let cache = JSON.parse(localStorage.getItem("cache")) || {};
 
-function sendRequest() {
-  const apiUrl = "https://api.statev.de/req/";
+// Konfiguration der Endpunkte und Tokens
+const apiUrl = "https://api.statev.de/req/";
+const corsAnywhereUrl = "https://statevproxy.pantelx.com/";
+const endpoints = {
+  totalWeightLab: "factory/inventory/65ca64cb06965a9320fb010e",
+  totalWeightCar: "factory/inventory/65ca64ca06965a9320fb0031",
+  marketOffersBuyLab: "factory/marketOffers/buy/65ca64cb06965a9320fb010e",
+  marketOffersSellLab: "factory/marketOffers/sell/65ca64cb06965a9320fb010e",
+  status: "factory/list",
+};
+const tokens = {
+  lab: "7YC9YM41X63SG52ZDL",
+  car: "7YC9YM41X63SG52ZDL",
+};
 
-  const totalWeightEndpointLab = "factory/inventory/65ca64cb06965a9320fb010e";
-  const totalWeightEndpointCar = "factory/inventory/65ca64ca06965a9320fb0031";
-  const marketOffersBuyLabEndpoint =
-    "factory/marketOffers/buy/65ca64cb06965a9320fb010e";
-  const marketOffersSellLabEndpoint =
-    "factory/marketOffers/sell/65ca64cb06965a9320fb010e";
-  const statusEndpoint = "factory/list";
+// Konfiguration der Fetch-Optionen
+const fetchConfig = (token) => ({
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+    authorization: "Bearer " + token,
+  },
+});
 
-  const bearerTokenLab = "7YC9YM41X63SG52ZDL";
-  //  const bearerTokenCar = "F9UKIAKBZDHWY6H6JG";
-  const bearerTokenCar = "7YC9YM41X63SG52ZDL";
-  const corsAnywhereUrl = "https://statevproxy.pantelx.com/"; // CORS Proxy - Fliegt bei IC Website raus
-
-  const fetchConfig = (bearerToken) => ({
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      authorization: "Bearer " + bearerToken,
-    },
-  });
-
-  const fetchData = (endpoint, config) => {
-    // Überprüfen, ob die Daten im Cache vorhanden sind und ob sie älter als 10 Min sind
-    if (cache[endpoint] && Date.now() - cache[endpoint].timestamp < 600000) {
-      return Promise.resolve(cache[endpoint].data);
-    } else {
-      return (
-        fetch(corsAnywhereUrl + apiUrl + endpoint, config)
-          //return fetch( apiUrl + endpoint, config)
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Network response was not ok");
-            }
-            return response.json();
-          })
-          .then((data) => {
-            // Daten im Cache speichern mit Zeitstempel
-            cache[endpoint] = { data: data, timestamp: Date.now() };
-            saveCacheToLocalStorage(); // Cache im Local Storage speichern
-            return data;
-          })
-          .catch((error) => {
-            console.error("Fehler beim Senden der Anfrage:", error);
-            return { error: true };
-          })
-      );
-    }
-  };
-
-  Promise.all([
-    fetchData(totalWeightEndpointLab, fetchConfig(bearerTokenLab)),
-    fetchData(totalWeightEndpointCar, fetchConfig(bearerTokenCar)),
-    fetchData(statusEndpoint, fetchConfig(bearerTokenCar)),
-    fetchData(statusEndpoint, fetchConfig(bearerTokenLab)),
-    fetchData(marketOffersBuyLabEndpoint, fetchConfig(bearerTokenLab)),
-    fetchData(marketOffersSellLabEndpoint, fetchConfig(bearerTokenLab)),
-  ]).then(
-    ([
-      labData,
-      carData,
-      carStatus,
-      labStatus,
-      marketOffersBuyLab,
-      marketOffersSellLab,
-    ]) => {
-      const totalWeightDivLab = document.getElementById("totalWeightLab");
-      const totalWeightDivCar = document.getElementById("totalWeightCar");
-      const carStatusDiv = document.getElementById("car-status");
-      const labStatusDiv = document.getElementById("lab-status");
-
-      if (labData.error) {
-        totalWeightDivLab.innerText =
-          "Datenabruf fehlgeschlagen. Versuche es später erneut!";
-      } else {
-        totalWeightDivLab.innerText = `${labData.totalWeight.toFixed(
-          0
-        )}/1850 KG`;
-      }
-
-      if (carData.error) {
-        totalWeightDivCar.innerText =
-          "Datenabruf fehlgeschlagen. Versuche es später erneut!";
-      } else {
-        totalWeightDivCar.innerText = `${carData.totalWeight.toFixed(
-          0
-        )}/7500 KG`;
-      }
-
-      if (carStatus.error) {
-        carStatusDiv.innerHTML =
-          "<strong class='statusweight'>Datenabruf fehlgeschlagen. Versuche es später erneut!</strong>";
-      } else {
-        carStatusDiv.innerHTML = carStatus[0].isOpen
-          ? "<a href='#' class='fa fa-check'></a>"
-          : "<a href='#' class='fa fa-times'></a>";
-      }
-
-      if (labStatus.error) {
-        labStatusDiv.innerHTML =
-          "<strong class='statusweight'>Datenabruf fehlgeschlagen. Versuche es später erneut!</strong>";
-      } else {
-        labStatusDiv.innerHTML = labStatus[0].isOpen
-          ? "<a href='#' class='fa fa-check'></a>"
-          : "<a href='#' class='fa fa-times'></a>";
-      }
-
-      if (!marketOffersBuyLab.error) {
-        populatemarketOffersBuyLabTable(marketOffersBuyLab);
-      } else {
-        console.error(
-          "Fehler beim Abrufen der Marktangebote:",
-          marketOffersBuyLab
-        );
-      }
-
-      if (!marketOffersSellLab.error) {
-        populatemarketOffersSellLabTable(marketOffersSellLab);
-      } else {
-        console.error(
-          "Fehler beim Abrufen der Marktangebote:",
-          marketOffersSellLab
-        );
-      }
-    }
-  );
-}
-
-// Funktion zum Befüllen der Marktangebote-Tabelle BUY
-function populatemarketOffersBuyLabTable(data) {
-  const tableBody = document.querySelector("#market-offers-buy tbody");
-  tableBody.innerHTML = ""; // Bestehende Inhalte löschen
-  data.forEach((item) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${item.item}</td>
-      <td>${item.availableAmount}</td>
-      <td>${(item.pricePerUnit * 0.95).toFixed(2)} $</td>
-      <td>Labor</td>
-    `;
-    tableBody.appendChild(row);
-  });
-}
-
-// Funktion zum Befüllen der Marktangebote-Tabelle SELL
-function populatemarketOffersSellLabTable(data) {
-  const tableBody = document.querySelector("#market-offers-sell tbody");
-  tableBody.innerHTML = ""; // Bestehende Inhalte löschen
-  data.forEach((item) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-        <td>${item.item}</td>
-        <td>${item.availableAmount}</td>
-        <td>${item.pricePerUnit.toFixed(2)} $</td>
-        <td>Labor</td>
-      `;
-    tableBody.appendChild(row);
-  });
-}
+// Funktion zum Abrufen und Cachen von Daten
+const fetchData = (endpoint, config) => {
+  if (cache[endpoint] && Date.now() - cache[endpoint].timestamp < 600000) {
+    return Promise.resolve(cache[endpoint].data);
+  } else {
+    return (
+      fetch(corsAnywhereUrl + apiUrl + endpoint, config)
+        //return fetch(apiUrl + endpoint, config)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          cache[endpoint] = { data, timestamp: Date.now() };
+          saveCacheToLocalStorage();
+          return data;
+        })
+        .catch((error) => {
+          console.error("Fehler beim Senden der Anfrage:", error);
+          return { error: true };
+        })
+    );
+  }
+};
 
 // Funktion zum Speichern des Caches im Local Storage
-function saveCacheToLocalStorage() {
+const saveCacheToLocalStorage = () => {
   localStorage.setItem("cache", JSON.stringify(cache));
-}
+};
 
-// Timeout-Funktion zum Löschen des Caches nach 10 Min
+// Hauptfunktion zum Senden der Anfragen
+const sendRequest = () => {
+  const requests = [
+    fetchData(endpoints.totalWeightLab, fetchConfig(tokens.lab)),
+    fetchData(endpoints.totalWeightCar, fetchConfig(tokens.car)),
+    fetchData(endpoints.status, fetchConfig(tokens.car)),
+    fetchData(endpoints.status, fetchConfig(tokens.lab)),
+    fetchData(endpoints.marketOffersBuyLab, fetchConfig(tokens.lab)),
+    fetchData(endpoints.marketOffersSellLab, fetchConfig(tokens.lab)),
+  ];
+
+  Promise.all(requests).then(handleResponses);
+};
+
+// Funktion zum Verarbeiten der Antworten
+const handleResponses = ([
+  labData,
+  carData,
+  carStatus,
+  labStatus,
+  marketOffersBuyLab,
+  marketOffersSellLab,
+]) => {
+  updateTotalWeight("totalWeightLab", labData, 1850);
+  updateTotalWeight("totalWeightCar", carData, 7500);
+  updateStatus("car-status", carStatus);
+  updateStatus("lab-status", labStatus);
+  updateMarketOffers("market-offers-buy", marketOffersBuyLab, 0.95);
+  updateMarketOffers("market-offers-sell", marketOffersSellLab);
+};
+
+// Funktion zum Aktualisieren des Gewichts
+const updateTotalWeight = (elementId, data, maxWeight) => {
+  const element = document.getElementById(elementId);
+  if (data.error) {
+    element.innerText = "Datenabruf fehlgeschlagen. Versuche es später erneut!";
+  } else {
+    element.innerText = `${data.totalWeight.toFixed(0)}/${maxWeight} KG`;
+  }
+};
+
+// Funktion zum Aktualisieren des Status
+const updateStatus = (elementId, data) => {
+  const element = document.getElementById(elementId);
+  if (data.error) {
+    element.innerHTML =
+      "<strong class='statusweight'>Datenabruf fehlgeschlagen. Versuche es später erneut!</strong>";
+  } else {
+    element.innerHTML = data[0].isOpen
+      ? "<a href='#' class='fa fa-check'></a>"
+      : "<a href='#' class='fa fa-times'></a>";
+  }
+};
+
+// Funktion zum Aktualisieren der Marktangebote
+const updateMarketOffers = (tableId, data, discount = 1) => {
+  const tableBody = document.querySelector(`#${tableId} tbody`);
+  tableBody.innerHTML = "";
+  if (data.error) {
+    console.error("Fehler beim Abrufen der Marktangebote:", data);
+  } else {
+    data.forEach((item) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${item.item}</td>
+        <td>${item.availableAmount}</td>
+        <td>${(item.pricePerUnit * discount).toFixed(2)} $</td>
+        <td>Labor</td>
+      `;
+      tableBody.appendChild(row);
+    });
+  }
+};
+
+// Timeout-Funktion zum Löschen des Caches nach 10 Minuten
 setTimeout(() => {
-  cache = {}; // Cache löschen
-  saveCacheToLocalStorage(); // Cache im Local Storage aktualisieren
+  cache = {};
+  saveCacheToLocalStorage();
 }, 600000);
 
 sendRequest();
