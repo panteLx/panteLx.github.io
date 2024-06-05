@@ -108,7 +108,7 @@ const updateStatus = (elementId, data) => {
 };
 
 // Funktion zum Aktualisieren der Marktangebote
-const updateMarketOffers = (tableId, data, discount = 1) => {
+const updateMarketOffers = (tableId, data, taxes = 1) => {
   const tableBody = document.querySelector(`#${tableId} tbody`);
   tableBody.innerHTML = "";
   if (data.error) {
@@ -119,7 +119,7 @@ const updateMarketOffers = (tableId, data, discount = 1) => {
       row.innerHTML = `
         <td>${item.item}</td>
         <td>${item.availableAmount}</td>
-        <td>${(item.pricePerUnit * discount).toFixed(2)} $</td>
+        <td>${(item.pricePerUnit * taxes).toFixed(2)} $</td>
         <td>Labor</td>
       `;
       tableBody.appendChild(row);
