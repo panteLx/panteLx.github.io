@@ -78,10 +78,31 @@ const handleResponses = ([
 ]) => {
   updateTotalWeight("totalWeightLab", labData, 1850);
   updateTotalWeight("totalWeightCar", carData, 7500);
-  updateStatus("car-status", carStatus);
-  updateStatus("lab-status", labStatus);
+  updateStatus("car-status", carStatus, endpoints.totalWeightCar);
+  updateStatus("lab-status", labStatus, endpoints.totalWeightLab);
   updateMarketOffers("market-offers-buy", marketOffersBuyLab, 0.95);
   updateMarketOffers("market-offers-sell", marketOffersSellLab);
+};
+
+// Funktion zum Aktualisieren des Status
+const updateStatus = (elementId, data, endpointId) => {
+  const element = document.getElementById(elementId);
+  if (data.error) {
+    element.innerHTML =
+      "<strong class='statusweight'>Datenabruf fehlgeschlagen. Versuche es später erneut!</strong>";
+  } else {
+    const factory = data.find(
+      (item) => item.id === endpointId.split("/").pop()
+    );
+    if (factory) {
+      element.innerHTML = factory.isOpen
+        ? "<a href='#' class='fa fa-check'></a>"
+        : "<a href='#' class='fa fa-times'></a>";
+    } else {
+      element.innerHTML =
+        "<strong class='statusweight'>Fabrik nicht gefunden!</strong>";
+    }
+  }
 };
 
 // Funktion zum Aktualisieren des Gewichts
@@ -91,19 +112,6 @@ const updateTotalWeight = (elementId, data, maxWeight) => {
     element.innerText = "Datenabruf fehlgeschlagen. Versuche es später erneut!";
   } else {
     element.innerText = `${data.totalWeight.toFixed(0)}/${maxWeight} KG`;
-  }
-};
-
-// Funktion zum Aktualisieren des Status
-const updateStatus = (elementId, data) => {
-  const element = document.getElementById(elementId);
-  if (data.error) {
-    element.innerHTML =
-      "<strong class='statusweight'>Datenabruf fehlgeschlagen. Versuche es später erneut!</strong>";
-  } else {
-    element.innerHTML = data[0].isOpen
-      ? "<a href='#' class='fa fa-check'></a>"
-      : "<a href='#' class='fa fa-times'></a>";
   }
 };
 
