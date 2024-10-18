@@ -11,8 +11,8 @@ const endpoints = {
   status: "factory/list",
 };
 const tokens = {
-  lab: "7YC9YM41X63SG52ZDL",
-  car: "7YC9YM41X63SG52ZDL",
+  lab: "xx",
+  car: "xx",
 };
 
 // Konfiguration der Fetch-Optionen
