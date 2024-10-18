@@ -2,6 +2,7 @@
 let cache = JSON.parse(localStorage.getItem("cache")) || {};
 
 // Konfiguration der Endpunkte und Tokens
+// Bitti nicht klaui *hamsti.mp3*
 const apiUrl = "https://api.statev.de/req/";
 const endpoints = {
   totalWeightLab: "factory/inventory/65ca64cb06965a9320fb010e",
